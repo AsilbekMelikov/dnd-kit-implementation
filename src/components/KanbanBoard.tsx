@@ -99,6 +99,7 @@ const KanbanBoard = () => {
     const overColumnId = over.id;
 
     if (activeColumnId === overColumnId) return;
+    console.log(activeColumnId);
 
     setColumns((columns) => {
       const activeColumnIndex = columns.findIndex(
@@ -108,6 +109,7 @@ const KanbanBoard = () => {
       const overColumnIndex = columns.findIndex(
         (col) => col.id === overColumnId
       );
+      console.log(activeColumnIndex);
       return arrayMove(columns, activeColumnIndex, overColumnIndex);
     });
   };
