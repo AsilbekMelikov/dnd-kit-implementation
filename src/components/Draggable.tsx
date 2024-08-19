@@ -1,6 +1,11 @@
 import { MouseEvent, ReactNode, useRef, useState } from "react";
 
-const Draggable = ({ children }: { children: ReactNode }) => {
+interface Props {
+  children: ReactNode;
+  isDraggingItem: boolean;
+}
+
+const Draggable = ({ children, isDraggingItem }: Props) => {
   const ourRef = useRef<HTMLDivElement | null>(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const mouseCoords = useRef({
@@ -10,7 +15,7 @@ const Draggable = ({ children }: { children: ReactNode }) => {
     scrollTop: 0,
   });
   const handleDragStart = (e: MouseEvent<HTMLDivElement>) => {
-    if (!ourRef.current) return;
+    if (!ourRef.current || isDraggingItem) return;
     const slider = ourRef.current.children[0] as HTMLElement;
     const startX = e.pageX - slider.offsetLeft;
     const startY = e.pageY - slider.offsetTop;
@@ -22,11 +27,11 @@ const Draggable = ({ children }: { children: ReactNode }) => {
   };
   const handleDragEnd = () => {
     setIsMouseDown(false);
-    if (!ourRef.current) return;
+    if (!ourRef.current || isDraggingItem) return;
     document.body.style.cursor = "default";
   };
   const handleDrag = (e: MouseEvent<HTMLDivElement>) => {
-    if (!isMouseDown || !ourRef.current) return;
+    if (!isMouseDown || !ourRef.current || isDraggingItem) return;
     e.preventDefault();
     const slider = ourRef.current.children[0] as HTMLElement;
     const x = e.pageX - slider.offsetLeft;
