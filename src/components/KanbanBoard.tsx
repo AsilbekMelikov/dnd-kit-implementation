@@ -16,6 +16,7 @@ import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
 import Draggable from "./Draggable";
+import { generateId } from "../lib/utils";
 
 const KanbanBoard = () => {
   const [columns, setColumns] = useState<Column[]>([]);
@@ -24,6 +25,7 @@ const KanbanBoard = () => {
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [isDraggingItem, setIsDraggingItem] = useState(false);
 
   const createTask = (columnId: Id) => {
     const newTask = {
@@ -73,12 +75,8 @@ const KanbanBoard = () => {
     setTasks(newTasks);
   };
 
-  const generateId = () => {
-    /* Generate a random number between 0 and 10000 */
-    return Math.floor(Math.random() * 10001);
-  };
-
   const handleDragStart = (e: DragStartEvent) => {
+    setIsDraggingItem(true);
     if (e.active.data.current?.type === "Column") {
       setActiveColumn(e.active.data.current.column);
       return;
@@ -92,6 +90,7 @@ const KanbanBoard = () => {
   const handleDragEnd = (e: DragEndEvent) => {
     setActiveColumn(null);
     setActiveTask(null);
+    setIsDraggingItem(false);
 
     const { active, over } = e;
 
@@ -100,6 +99,7 @@ const KanbanBoard = () => {
     const overColumnId = over.id;
 
     if (activeColumnId === overColumnId) return;
+    console.log(activeColumnId);
 
     setColumns((columns) => {
       const activeColumnIndex = columns.findIndex(
@@ -109,6 +109,7 @@ const KanbanBoard = () => {
       const overColumnIndex = columns.findIndex(
         (col) => col.id === overColumnId
       );
+      console.log(activeColumnIndex);
       return arrayMove(columns, activeColumnIndex, overColumnIndex);
     });
   };
@@ -123,7 +124,7 @@ const KanbanBoard = () => {
     if (activeId === overId) return;
 
     const isActiveTask = active.data.current?.type === "Task";
-    const isOverTask = active.data.current?.type === "Task";
+    const isOverTask = over.data.current?.type === "Task";
 
     if (!isActiveTask) return;
 
@@ -155,7 +156,7 @@ const KanbanBoard = () => {
   };
 
   return (
-    <Draggable>
+    <Draggable isDraggingItem={isDraggingItem}>
       <div className="m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-10">
         <DndContext
           sensors={sensors}
